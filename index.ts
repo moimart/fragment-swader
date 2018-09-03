@@ -1,15 +1,23 @@
-import * as swader from './lib';
+import {
+    vec2,
+    vec3,
+    vec4,
+    Shader,
+    textureInfo,
+    ShaderProcess,
+    distance,
+    textureFetch
+} from './lib';
 
-let myShader: swader.Shader = (coords: swader.vec2, samplers: Array<swader.textureInfo>) => {
-    let d = (0.8 - swader.distance(coords, [.5, .5]));
-
-    let c = swader.textureFetch(samplers[0],coords);
+let myShader: Shader = (coords: vec2, samplers: Array<textureInfo>) => {
+    let d = (0.8 - distance(coords, new vec2(.5, .5)));
+    let c = textureFetch(samplers[0], new vec2(coords.x,coords.y),"repeat");
 
     return [d*c[0], d*c[1], d*c[2], 1];
 }
 
 async function doIt() {
-    let s = new swader.ShaderProcess(myShader);
+    let s = new ShaderProcess(myShader);
     await s.addTexture('texture.png');
     s.run();
     s.extract().png().toFile('test.png', (err, info) => {

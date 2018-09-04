@@ -1,12 +1,4 @@
-export {
-    vec2,
-    vec3,
-    vec4,
-    length,
-    distance,
-    clamp,
-    RGBA
-} from './math';
+export * from './math';
 
 export {
     textureInfo,

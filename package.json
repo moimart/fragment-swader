@@ -10,6 +10,10 @@
   },
   "author": "Moises Martinez <moises@kikkei.com>",
   "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moimart/fragment-swader"
+  },
   "dependencies": {
     "sharp": "^0.20.7"
   },

@@ -21,7 +21,7 @@ let myShader: Shader = (coords: vec2, samplers: Array<textureInfo>) => {
     return color;
 }
 
-async function doIt() {
+async function _() {
     let s = new ShaderProcess(myShader);
     await s.addTexture('texture.png').catch(err => console.error(err));
     s.run();
@@ -30,4 +30,4 @@ async function doIt() {
     });
 }
 
-doIt();
+_();

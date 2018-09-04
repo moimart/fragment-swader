@@ -3,11 +3,11 @@ export class vec2 {
     public y: number = 0;
 
     constructor(x?: number, y?: number) {
-        if (x) {
+        if (x != null) {
             this.x = x;
         }
 
-        if (y) {
+        if (y != null) {
             this.y = y;
         }
     }
@@ -52,7 +52,7 @@ export class vec3 extends vec2 {
     constructor(x?: number, y?: number, z?: number) {
         super(x, y);
 
-        if (z) {
+        if (z != null) {
             this.z = z;
         }
     }
@@ -96,7 +96,7 @@ export class vec4 extends vec3 {
     constructor(x?: number, y?: number, z?: number, w?: number) {
         super(x, y, z);
 
-        if (w) {
+        if (w != null) {
             this.w = w;
         }
     }
@@ -210,20 +210,17 @@ export function length(orig: any): number {
     return Math.sqrt(orig.x * orig.x + orig.y * orig.y);
 }
 export function clamp(p0: any, min: any, max: any): any {
+
+    if (typeof (p0) == "number") {
+        let clamped:number = p0;
+        if (p0 < min) clamped = min;
+        if (p0 > max) clamped = max;
+        return clamped;
+    }
+
     let clamped: any = null;
-    if (p0 instanceof vec3) {
-
-        clamped = new vec3();
-        if (p0.x < min.x) clamped.x = min.x;
-        if (p0.x > max.x) clamped.x = max.x;
-        if (p0.y < min.y) clamped.y = min.y;
-        if (p0.y < max.y) clamped.y = max.y;
-        if (p0.z < min.z) clamped.z = min.z;
-        if (p0.z < max.z) clamped.z = max.z;
-
-
-    } else if (p0 instanceof vec4) {
-        clamped = new vec4();
+    if (p0 instanceof vec4) {
+        clamped = new vec4(p0.x, p0.y, p0.z, p0.w);
         if (p0.x < min.x) clamped.x = min.x;
         if (p0.x > max.x) clamped.x = max.x;
         if (p0.y < min.y) clamped.y = min.y;
@@ -232,9 +229,22 @@ export function clamp(p0: any, min: any, max: any): any {
         if (p0.z < max.z) clamped.z = max.z;
         if (p0.z < min.w) clamped.w = min.w;
         if (p0.z < max.w) clamped.w = max.w;
+
+        return clamped;
+    } else if (p0 instanceof vec3) {
+
+        clamped = new vec3(p0.x,p0.y,p0.z);
+        if (p0.x < min.x) clamped.x = min.x;
+        if (p0.x > max.x) clamped.x = max.x;
+        if (p0.y < min.y) clamped.y = min.y;
+        if (p0.y < max.y) clamped.y = max.y;
+        if (p0.z < min.z) clamped.z = min.z;
+        if (p0.z < max.z) clamped.z = max.z;
+
+        return clamped;
     }
 
-    clamped = new vec2();
+    clamped = new vec2(p0.x,p0.y);
 
     if (p0.x < min.x) clamped.x = min.x;
     if (p0.y < min.y) clamped.y = min.y;
@@ -245,19 +255,102 @@ export function clamp(p0: any, min: any, max: any): any {
 }
 
 export function step(edge:any, x: any):any {
-    if (edge instanceof vec3 && x instanceof vec3) {
-
-    } else if (edge instanceof vec4 && x instanceof vec4) {
-
+    if (edge instanceof vec4 && x instanceof vec4) {
+        let v: vec4 = new vec4();
+        v.x = (x.x < edge.x) ? 0 : 1;
+        v.y = (x.y < edge.y) ? 0 : 1;
+        v.z = (x.z < edge.z) ? 0 : 1;
+        v.w = (x.w < edge.w) ? 0 : 1;
+        return v;
     }
+    else if (edge instanceof vec3 && x instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = (x.x < edge.x) ? 0 : 1;
+        v.y = (x.y < edge.y) ? 0 : 1;
+        v.z = (x.z < edge.z) ? 0 : 1;
+        return v;
+    }  else if (edge instanceof vec3 && typeof (x) == "number") {
+        let v: vec3 = new vec3();
+        v.x = (x < edge.x) ? 0 : 1;
+        v.y = (x < edge.y) ? 0 : 1;
+        v.z = (x < edge.z) ? 0 : 1;
+        return v;
+    } else if (typeof (edge) == "number" && typeof (x) == "number") {
+        return (x < edge) ? 0 : 1;
+    }
+
+    let v: vec2 = new vec2();
+    v.x = (x.x < edge.x) ? 0 : 1;
+    v.y = (x.y < edge.y) ? 0 : 1;
+    return v;
 }
 
 export function smoothstep(edge0: any, edge1: any, x: any):any {
-    if (edge0 instanceof vec3 && edge1 instanceof vec3) {
-
-    } else if (edge0 instanceof vec4 && edge1 instanceof vec4) {
-
+    if (x instanceof vec4) {
+        if (typeof (edge0) == "number" && typeof (edge1) == "number") {
+            let t: vec4 = new vec4();
+            t.x = clamp((x.x - edge0) / (edge1 - edge0), 0, 1);
+            t.y = clamp((x.y - edge0) / (edge1 - edge0), 0, 1);
+            t.z = clamp((x.z - edge0) / (edge1 - edge0), 0, 1);
+            t.w = clamp((x.w - edge0) / (edge1 - edge0), 0, 1);
+            t.x = t.x * t.x * (3 - 2 * t.x);
+            t.y = t.y * t.y * (3 - 2 * t.y);
+            t.z = t.z * t.z * (3 - 2 * t.z);
+            t.w = t.w * t.w * (3 - 2 * t.w);
+            return t;
+        } else {
+          let t: vec4 = new vec4();
+          t.x = clamp((x.x - edge0.x) / (edge1.x - edge0.x), 0, 1);
+          t.y = clamp((x.y - edge0.y) / (edge1.y - edge0.y), 0, 1);
+          t.z = clamp((x.z - edge0.z) / (edge1.z - edge0.z), 0, 1);
+          t.w = clamp((x.w - edge0.w) / (edge1.w - edge0.w), 0, 1);
+          t.x = t.x * t.x * (3 - 2 * t.x);
+          t.y = t.y * t.y * (3 - 2 * t.y);
+          t.z = t.z * t.z * (3 - 2 * t.z);
+          t.w = t.w * t.w * (3 - 2 * t.w);
+          return t;
+        }
+    } else if (x instanceof vec3) {
+        if (typeof (edge0) == "number" && typeof (edge1) == "number") {
+            let t: vec3 = new vec3();
+            t.x = clamp((x.x - edge0) / (edge1 - edge0), 0, 1);
+            t.y = clamp((x.y - edge0) / (edge1 - edge0), 0, 1);
+            t.z = clamp((x.z - edge0) / (edge1 - edge0), 0, 1);
+            t.x = t.x * t.x * (3 - 2 * t.x);
+            t.y = t.y * t.y * (3 - 2 * t.y);
+            t.z = t.z * t.z * (3 - 2 * t.z);
+            
+            return t;
+        } else {
+            let t: vec3 = new vec3();
+            t.x = clamp((x.x - edge0.x) / (edge1.x - edge0.x), 0, 1);
+            t.y = clamp((x.y - edge0.y) / (edge1.y - edge0.y), 0, 1);
+            t.z = clamp((x.z - edge0.z) / (edge1.z - edge0.z), 0, 1);
+            t.x = t.x * t.x * (3 - 2 * t.x);
+            t.y = t.y * t.y * (3 - 2 * t.y);
+            t.z = t.z * t.z * (3 - 2 * t.z);
+            return t;
+        }
+    } else if (x instanceof vec2) {
+        if (typeof(edge0) == "number" && typeof(edge1) == "number") {
+            let t: vec2 = new vec2();
+            t.x = clamp((x.x - edge0) / (edge1 - edge0), 0, 1);
+            t.y = clamp((x.y - edge0) / (edge1 - edge0), 0, 1);
+            t.x = t.x * t.x * (3 - 2 * t.x);
+            t.y = t.y * t.y * (3 - 2 * t.y);
+            return t;
+        } else {
+            let t: vec2 = new vec2();
+            t.x = clamp((x.x - edge0.x) / (edge1.x - edge0.x), 0, 1);
+            t.y = clamp((x.y - edge0.y) / (edge1.y - edge0.y), 0, 1);
+            t.x = t.x * t.x * (3 - 2 * t.x);
+            t.y = t.y * t.y * (3 - 2 * t.y);
+            return t;
+        }
     }
+
+    let t:number =  clamp((x - edge0) / (edge1 - edge0),0,1);
+    return t * t * (3 - 2 * t);
 }
 
 export function mix(x: any, y: any, a: any):any {
@@ -272,18 +365,46 @@ export function mix(x: any, y: any, a: any):any {
 
 export function radians(degrees: any): any {
     if (degrees instanceof vec3) {
-
+        let v:vec3 = new vec3();
+        v.x = 0;
+        v.y = 0;
+        v.z = 0;
+        return v;
     } else if (degrees instanceof vec4) {
-
+        let v: vec4 = new vec4();
+        v.x = 0;
+        v.y = 0;
+        v.z = 0;
+        v.w = 0;
+        return v;
     }
+
+    let v: vec2 = new vec2();
+    v.x = 0;
+    v.y = 0;
+    return v;
 }
 
 export function degrees(radians:any):any {
     if (radians instanceof vec3) {
-
+        let v: vec3 = new vec3();
+        v.x = 0;
+        v.y = 0;
+        v.z = 0;
+        return v;
     } else if (radians instanceof vec4) {
-
+        let v: vec4 = new vec4();
+        v.x = 0;
+        v.y = 0;
+        v.z = 0;
+        v.w = 0;
+        return v;
     }
+
+    let v: vec2 = new vec2();
+    v.x = 0;
+    v.y = 0;
+    return v;
 }
 
 export function sin(x:any): any {

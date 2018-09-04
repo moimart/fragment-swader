@@ -1,8 +1,9 @@
 {
   "name": "fragment-swader",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Write fragment shaders in typescript for static image manipulation",
   "main": "build/index.js",
+  "types": "swader/index.d.ts",
   "scripts": {
     "build": "webpack",
     "start": "node build/index.js"
@@ -10,8 +11,6 @@
   "author": "Moises Martinez <moises@kikkei.com>",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "color-convert": "^1.9.2",
-    "delta-e": "^0.0.7",
     "sharp": "^0.20.7"
   },
   "devDependencies": {

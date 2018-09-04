@@ -20,12 +20,20 @@ export class vec2 {
         return new vec2(this.x - p0.x, this.y - p0.y);
     }
 
-    mul(p0:number): vec2 {
-        return new vec2(this.x*p0,this.y*p0);
+    mul(p0:number | vec2): vec2 {
+        if (p0 instanceof vec2) {
+            return new vec2(this.x * p0.x, this.y * p0.y);
+        }
+
+        return new vec2(this.x * p0,this.y * p0);
     }
 
-    div(p0: number): vec2 {
-      return new vec2(this.x / p0, this.y / p0);
+    div(p0: number | vec2): vec2 {
+        if (p0 instanceof vec2) {
+            return new vec2(this.x / p0.x, this.y / p0.y);
+        }
+
+        return new vec2(this.x / p0, this.y / p0);
     }
 }
 
@@ -57,11 +65,19 @@ export class vec3 extends vec2 {
         return new vec3(this.x - p0.x, this.y - p0.y, this.z - p0.z);
     }
 
-    mul(p0: number): vec3 {
+    mul(p0: number | vec3): vec3 {
+        if (p0 instanceof vec3) {
+            return new vec3(this.x * p0.x, this.y * p0.y, this.z * p0.z);
+        }
+
         return new vec3(this.x * p0, this.y * p0, this.z * p0);
     }
 
-    div(p0: number): vec3 {
+    div(p0: number | vec3): vec3 {
+        if (p0 instanceof vec3) {
+            return new vec3(this.x / p0.x, this.y / p0.y, this.z / p0.z);
+        }
+
         return new vec3(this.x / p0, this.y / p0, this.z / p0);
     }
 }
@@ -93,11 +109,19 @@ export class vec4 extends vec3 {
         return new vec4(this.x - p0.x, this.y - p0.y, this.z - p0.z, this.w - p0.w);
     }
 
-    mul(p0: number): vec4 {
-      return new vec4(this.x * p0, this.y * p0, this.z * p0, this.w * p0);
+    mul(p0: number | vec4): vec4 {
+        if (p0 instanceof vec4) {
+          return new vec4(this.x * p0.x, this.y * p0.y, this.z * p0.z, this.w * p0.w);
+        }
+
+        return new vec4(this.x * p0, this.y * p0, this.z * p0, this.w * p0);
     }
 
-    div(p0: number): vec4 {
+    div(p0: number | vec4): vec4 {
+        if (p0 instanceof vec4) {
+            return new vec4(this.x / p0.x, this.y / p0.y, this.z / p0.z, this.w / p0.w);
+        }
+
         return new vec4(this.x / p0, this.y / p0, this.z / p0, this.w / p0);
     }
 }

@@ -6,7 +6,7 @@
   "types": "swader/index.d.ts",
   "scripts": {
     "build": "webpack",
-    "start": "node build/index.js"
+    "example": "node build/index.js"
   },
   "author": "Moises Martinez <moises@kikkei.com>",
   "license": "BSD-2-Clause",

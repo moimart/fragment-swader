@@ -7,11 +7,11 @@ import {
     ShaderProcess,
     distance,
     textureFetch
-} from './lib';
+} from './swader';
 
 let myShader: Shader = (coords: vec2, samplers: Array<textureInfo>) => {
     let d = (0.8 - distance(coords, new vec2(.5, .5)));
-    let c = textureFetch(samplers[0], new vec2(coords.x,coords.y),"repeat");
+    let c = textureFetch(samplers[0], new vec2(coords.x,coords.y));
 
     return [d*c[0], d*c[1], d*c[2], 1];
 }

@@ -19,19 +19,24 @@ export class ShaderProcess {
     }
 
     async addTexture(texture: string) {
-        let image = sharp(texture);
-        let data = await image.raw().toBuffer();
-        let arr = new Uint32Array(data.length / 4);
 
-        let read = 0;
-        let i = 0;
-        while (read < data.length) {
-            arr[i++] = data.readUInt32LE(read);
-            read += 4;
+        try {
+            let image = sharp(texture);
+            let data = await image.raw().toBuffer();
+            let arr = new Uint32Array(data.length / 4);
+
+            let read = 0;
+            let i = 0;
+            while (read < data.length) {
+                arr[i++] = data.readUInt32LE(read);
+                read += 4;
+            }
+
+            let metadata = await image.metadata();
+            this.samplers.push([arr, new vec2(metadata.width, metadata.height)]);
+        } catch(e) {
+            throw 'Could not load texture ' + e;
         }
-
-        let metadata = await image.metadata();
-        this.samplers.push([arr, new vec2(metadata.width, metadata.height)]);
     }
 
     run(): void {
@@ -40,7 +45,7 @@ export class ShaderProcess {
             for (let j = 0; j < this.size.x; j++) {
                 let fragment: RGBA = this.execute(new vec2(j / this.size.x, i / this.size.y));
                 const order = i * this.size.x + j;
-                buffer[order] = fragment[3] << 24 | fragment[2] << 16 | fragment[1] << 8 | fragment[0];
+                buffer[order] = fragment.w << 24 | fragment.z << 16 | fragment.y << 8 | fragment.x;
             }
         }
         this._framebuffer = Buffer.from(buffer.buffer);
@@ -57,12 +62,6 @@ export class ShaderProcess {
     }
 
     execute(coords: vec2): RGBA {
-        let fragColor: RGBA = [255, 0, 0, 255];
-        fragColor = this.shader(coords, this.samplers);
-        return this.toByte(fragColor);
-    }
-
-    private toByte(color: RGBA): RGBA {
-        return [color[0] * 255, color[1] * 255, color[2] * 255, color[3] * 255];
+        return this.shader(coords, this.samplers).mul(255);
     }
 }

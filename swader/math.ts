@@ -19,9 +19,22 @@ export class vec2 {
     sub(p0: vec2): vec2 {
         return new vec2(this.x - p0.x, this.y - p0.y);
     }
+
+    mul(p0:number): vec2 {
+        return new vec2(this.x*p0,this.y*p0);
+    }
+
+    div(p0: number): vec2 {
+      return new vec2(this.x / p0, this.y / p0);
+    }
 }
 
 export function _vec2(x?: number, y?: number) {
+
+    if (y == null) {
+        return new vec2(x,x);
+    }
+
     return new vec2(x,y);
 }
 
@@ -43,9 +56,21 @@ export class vec3 extends vec2 {
     sub(p0: vec3): vec3 {
         return new vec3(this.x - p0.x, this.y - p0.y, this.z - p0.z);
     }
+
+    mul(p0: number): vec3 {
+        return new vec3(this.x * p0, this.y * p0, this.z * p0);
+    }
+
+    div(p0: number): vec3 {
+        return new vec3(this.x / p0, this.y / p0, this.z / p0);
+    }
 }
 
-export function _vec3(x?: number, y?: number, z?: number) {
+export function _vec3(x?: number | vec2, y?: number, z?: number) {
+    if (x instanceof vec2) {
+        return new vec3(x.x,x.y,0);
+    }
+
     return new vec3(x,y,z);
 }
 
@@ -67,16 +92,28 @@ export class vec4 extends vec3 {
     sub(p0: vec4): vec4 {
         return new vec4(this.x - p0.x, this.y - p0.y, this.z - p0.z, this.w - p0.w);
     }
+
+    mul(p0: number): vec4 {
+      return new vec4(this.x * p0, this.y * p0, this.z * p0, this.w * p0);
+    }
+
+    div(p0: number): vec4 {
+        return new vec4(this.x / p0, this.y / p0, this.z / p0, this.w / p0);
+    }
 }
 
-export function _vec4(x?: number, y?: number, z?: number, w?: number) {
+export function _vec4(x?: number | vec3, y?: number, z?: number, w?: number) {
+    if (x instanceof vec3) {
+        return new vec4(x.x,x.y,x.z,0);
+    }
+
     return new vec4(x, y, z, w);
 }
 
-export type RGBA = [number, number, number, number];
+export type RGBA = vec4;
 export function dot(x:any, y:any): any {
     if (x instanceof vec3 && y instanceof vec3) {
-
+        
     } else if (x instanceof vec4 && y instanceof vec4) {
 
     }
@@ -359,18 +396,46 @@ export function atan(x: any, y:any): any {
 
 export function exp(x: any): any {
     if (x instanceof vec3) {
-
+        let v: vec3 = new vec3();
+        v.x = Math.exp(x.x);
+        v.y = Math.exp(x.y);
+        v.z = Math.exp(x.z);
+        return v;
     } else if (x instanceof vec4) {
-
+        let v: vec4 = new vec4();
+        v.x = Math.exp(x.x);
+        v.y = Math.exp(x.y);
+        v.z = Math.exp(x.z);
+        v.w = Math.exp(x.w);
+        return v;
     }
+
+    let v: vec2 = new vec2();
+    v.x = Math.log(x.x);
+    v.y = Math.log(x.y);
+    return v;
 }
 
 export function log(x: any): any {
     if (x instanceof vec3) {
-
+        let v: vec3 = new vec3();
+        v.x = Math.log(x.x);
+        v.y = Math.log(x.y);
+        v.z = Math.log(x.z);
+        return v;
     } else if (x instanceof vec4) {
-
+        let v: vec4 = new vec4();
+        v.x = Math.log(x.x);
+        v.y = Math.log(x.y);
+        v.z = Math.log(x.z);
+        v.w = Math.log(x.w);
+        return v;
     }
+
+    let v: vec2 = new vec2();
+    v.x = Math.log(x.x);
+    v.y = Math.log(x.y);
+    return v;
 }
 
 export function exp2(x: any): any {
@@ -383,10 +448,24 @@ export function exp2(x: any): any {
 
 export function log2(x: any): any {
     if (x instanceof vec3) {
-
+        let v: vec3 = new vec3();
+        v.x = Math.log2(x.x);
+        v.y = Math.log2(x.y);
+        v.z = Math.log2(x.z);
+        return v;
     } else if (x instanceof vec4) {
-
+        let v: vec4 = new vec4();
+        v.x = Math.log2(x.x);
+        v.y = Math.log2(x.y);
+        v.z = Math.log2(x.z);
+        v.w = Math.log2(x.w);
+        return v;
     }
+
+    let v: vec2 = new vec2();
+    v.x = Math.log2(x.x);
+    v.y = Math.log2(x.y);
+    return v;
 }
 
 export function inversesqrt(x: any): any {

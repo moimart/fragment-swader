@@ -13,18 +13,20 @@ import {
 } from './swader';
 
 let myShader: Shader = (coords: vec2, samplers: Array<textureInfo>) => {
-    let d = (0.8 - distance(coords, _vec2(.5, .5)));
+    let d = (0.8 - distance(coords, _vec2(.5)));
     let c = textureFetch(samplers[0], _vec2(coords.x,coords.y));
-
-    return [d*c[0], d*c[1], d*c[2], 1];
+    
+    let color = c.mul(d);
+    color.w = 1;
+    return color;
 }
 
 async function doIt() {
     let s = new ShaderProcess(myShader);
-    await s.addTexture('texture.png');
+    await s.addTexture('texture.png').catch(err => console.error(err));
     s.run();
     s.extract().png().toFile('test.png', (err, info) => {
-        console.log(err);
+        err && console.log(err);
     });
 }
 

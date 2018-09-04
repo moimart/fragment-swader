@@ -1,4 +1,4 @@
-import { vec2, RGBA } from './math';
+import { vec2, vec4, _vec4, RGBA } from './math';
 
 export type textureInfo = [Uint32Array, vec2];
 
@@ -18,8 +18,8 @@ export function textureFetch(texture: textureInfo, coords: vec2, mode: string = 
 
     let rawColor = data[rCoords.y * size.x + rCoords.x];
 
-    let rawRGBA: RGBA = [rawColor & 0xff, (rawColor >> 8) & 0xff, (rawColor >> 16) & 0xff, (rawColor >> 24) & 0xff];
-
-    return [rawRGBA[0] / 255, rawRGBA[1] / 255, rawRGBA[2] / 255, rawRGBA[3] / 255];
+    let rawRGBA: RGBA = new vec4(rawColor & 0xff, (rawColor >> 8) & 0xff, (rawColor >> 16) & 0xff, (rawColor >> 24) & 0xff);
+    
+    return rawRGBA.div(255);
 }
 

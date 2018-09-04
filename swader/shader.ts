@@ -19,7 +19,6 @@ export class ShaderProcess {
     }
 
     async addTexture(texture: string) {
-
         try {
             let image = sharp(texture);
             let data = await image.raw().toBuffer();
@@ -37,6 +36,19 @@ export class ShaderProcess {
         } catch(e) {
             throw 'Could not load texture ' + e;
         }
+    }
+
+    addTextureFromFramebuffer(texture: Buffer, size:vec2) {
+        let arr = new Uint32Array(texture.length / 4);
+    
+        let read = 0;
+        let i = 0;
+        while (read < texture.length) {
+            arr[i++] = texture.readUInt32LE(read);
+            read += 4;
+        }
+
+        this.samplers.push([arr, size]);
     }
 
     run(): void {

@@ -15,11 +15,11 @@ export class vec2 {
     }
 
     public get flipY():vec2 {
-        return new vec2(this.x,-this.y);
+        return new vec2(this.x,1 - this.y);
     }
 
     public get flipX(): vec2 {
-        return new vec2(-this.x, this.y);
+        return new vec2(1 - this.x, this.y);
     }
 
     constructor(x?: number, y?: number) {

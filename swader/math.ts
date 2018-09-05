@@ -14,6 +14,14 @@ export class vec2 {
         return new vec2(this.y,this.x);
     }
 
+    public get flipY():vec2 {
+        return new vec2(this.x,-this.y);
+    }
+
+    public get flipX(): vec2 {
+        return new vec2(-this.x, this.y);
+    }
+
     constructor(x?: number, y?: number) {
         if (x != null) {
             this.x = x;

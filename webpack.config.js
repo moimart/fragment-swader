@@ -12,7 +12,7 @@ module.exports = [{
         path: path.join(__dirname,"/build"),
         libraryTarget: "commonjs"
     },
-    entry: './index.ts',
+    entry: './test.ts',
     module: {
         rules: [
             {

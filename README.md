@@ -32,10 +32,10 @@ import {
 
 //Actual typescript shader code
 let myShader: Shader = (coords: vec2, samplers: Array<textureInfo>) => {
-    let uv: vec2 = coords.mul(2).sub(1);
+    let uv: vec2 = coords.mul(2).neg().add (1);
     let n: vec3 = textureFetch(samplers[0], coords).rgb;
-    let f = 1 - length(pow(uv,_vec2(5)));
-    let d: vec3 = n.mul(f).add(n.mul(.5*(1 - f)));
+    let f = 1 - length(pow(uv,_vec2(6)));
+    let d: vec3 = n.mul(f).add(n.mul(.2*(1 - f)));
 
     return _vec4(d);
 }

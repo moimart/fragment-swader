@@ -2,10 +2,7 @@ import { vec2, vec4, _vec4, RGBA } from './math';
 
 export type textureInfo = [Uint32Array, vec2];
 
-export function textureFetch(texture: textureInfo, coords: vec2, mode: string = "clamp", filtering: string = "bilinear"): RGBA {
-    let size = texture[1];
-    let data = texture[0];
-
+function nearestNeighbor(coords:vec2, size:vec2, data:Uint32Array, mode:string):RGBA {
     let rCoords: vec2 = new vec2(Math.floor(coords.x * size.x), Math.floor(coords.y * size.y));
 
     if (mode == "clamp") {
@@ -18,8 +15,27 @@ export function textureFetch(texture: textureInfo, coords: vec2, mode: string = 
 
     let rawColor = data[rCoords.y * size.x + rCoords.x];
 
-    let rawRGBA: RGBA = new vec4(rawColor & 0xff, (rawColor >> 8) & 0xff, (rawColor >> 16) & 0xff, (rawColor >> 24) & 0xff);
+    return new vec4(
+        rawColor & 0xff, 
+        (rawColor >> 8) & 0xff, 
+        (rawColor >> 16) & 0xff, 
+        (rawColor >> 24) & 0xff);
+}
+
+function bilinear(coords: vec2, size: vec2, data: Uint32Array, mode: string): RGBA {
+    return new vec4(1);
+}
+
+export function textureFetch(texture: textureInfo, coords: vec2, mode: string = "clamp", filtering: string = "nearest"): RGBA {
+    let rgba: RGBA = new vec4();
+    switch (filtering) {
+        case "bilinear":
+            rgba = bilinear(coords, texture[1], texture[0], mode);
+        case "nearest":
+        default:
+            rgba = nearestNeighbor(coords, texture[1], texture[0], mode);
+    }
     
-    return rawRGBA.div(255);
+    return rgba.div(255);
 }
 

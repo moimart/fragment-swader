@@ -10,6 +10,22 @@ export class vec2 {
         return this.y;
     }
 
+    public get r():number {
+        return this.x;
+    }
+
+    public get g(): number {
+        return this.y;
+    }
+
+    public set r(r:number) {
+        this.x = r;
+    }
+
+    public set g(g:number) {
+        this.y = g;
+    }
+
     public get vu():vec2 {
         return new vec2(this.y,this.x);
     }
@@ -92,6 +108,14 @@ export class vec3 extends vec2 {
         }
     }
 
+    public get b(): number {
+        return this.z;
+    }
+
+    public set b(b: number) {
+        this.z = b;
+    }
+
     add(p0: number | vec3): vec3 {
         if (typeof (p0) == 'number') {
             return new vec3(this.x + p0, this.y + p0, this.z+ p0);
@@ -152,6 +176,14 @@ export class vec4 extends vec3 {
         return new vec3(this.x, this.y, this.z);
     }
 
+    public get a(): number {
+        return this.w;
+    }
+
+    public set a(a: number) {
+        this.w = a;
+    }
+
     add(p0: vec4): vec4 {
         return new vec4(this.x + p0.x, this.y + p0.y, this.z + p0.z, this.w + p0.w);
     }
@@ -175,6 +207,7 @@ export class vec4 extends vec3 {
 
         return new vec4(this.x / p0, this.y / p0, this.z / p0, this.w / p0);
     }
+    
     neg(): vec4 {
         return new vec4(-this.x, -this.y, -this.z, -this.w);
     }
@@ -309,7 +342,8 @@ export function clamp(p0: any, min: any, max: any): any {
 }
 export function pow(x:any,y:any):any {
     if (x instanceof vec4 && y instanceof vec4) {
-        let v: vec4 = new vec4();;
+        let v: vec4 = new vec4();
+        v = clamp(v,0,1);
         v.x = Math.pow(x.x,y.x);
         v.y = Math.pow(x.y,y.y);
         v.z = Math.pow(x.z,y.z);
@@ -317,19 +351,23 @@ export function pow(x:any,y:any):any {
         return v;
     } else if (x instanceof vec3 && y instanceof vec3) {
         let v: vec3 = new vec3();
+        v = clamp(v, 0, 1);
         v.x = Math.pow(x.x, y.x);
         v.y = Math.pow(x.y, y.y);
         v.z = Math.pow(x.z, y.z);
         return v;
     } else if (x instanceof vec2 && y instanceof vec2) {
         let v: vec2 = new vec2();
+        v = clamp(v, 0, 1);
         v.x = Math.pow(x.x, y.x);
         v.y = Math.pow(x.y, y.y);
         return v;
     }
 
     if (typeof (x) == "number" && typeof (y) == "number") {
-        return (Math.pow(x as number, y as number));
+        let xx = clamp(x as number, 0, 1);
+        let yy = clamp(y as number, 0, 1);
+        return (Math.pow(xx,yy));
     }
     return 1;
 }

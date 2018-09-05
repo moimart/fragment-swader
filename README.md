@@ -26,6 +26,8 @@ import {
     ShaderProcess,
     distance,
     step,
+    length,
+    pow,
     smoothstep,
     textureFetch
 } from 'fragment-swader';

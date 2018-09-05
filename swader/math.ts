@@ -168,7 +168,7 @@ export class vec4 extends vec3 {
         return new vec4(this.x / p0, this.y / p0, this.z / p0, this.w / p0);
     }
     neg(): vec4 {
-        return new vec3(-this.x, -this.y, -this.z, -this.w);
+        return new vec4(-this.x, -this.y, -this.z, -this.w);
     }
 }
 

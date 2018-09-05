@@ -2,6 +2,18 @@ export class vec2 {
     public x: number = 0;
     public y: number = 0;
 
+    public get u():number {
+        return this.x;
+    }
+
+    public get v():number { 
+        return this.y;
+    }
+
+    public get vu():vec2 {
+        return new vec2(this.y,this.x);
+    }
+
     constructor(x?: number, y?: number) {
         if (x != null) {
             this.x = x;
@@ -12,11 +24,22 @@ export class vec2 {
         }
     }
 
-    add(p0: vec2): vec2 {
+    add(p0: number | vec2): vec2 {
+        if (typeof (p0) == "number") {
+            return new vec2(this.x + p0, this.y + p0);
+        }
+
         return new vec2(this.x + p0.x, this.y + p0.y);
     }
 
-    sub(p0: vec2): vec2 {
+    sub(p0: number | vec2): vec2 {
+        if (typeof (p0) == "number") {
+            let v:vec2 = new vec2(this.x - p0, this.y - p0);
+            v.x = (v.x < 0) ? 0 : v.x;
+            v.y = (v.y < 0) ? 0 : v.y;
+            return v; 
+        }
+
         return new vec2(this.x - p0.x, this.y - p0.y);
     }
 
@@ -34,6 +57,10 @@ export class vec2 {
         }
 
         return new vec2(this.x / p0, this.y / p0);
+    }
+
+    neg(): vec2 {
+        return new vec3(-this.x, -this.y);
     }
 }
 
@@ -57,11 +84,19 @@ export class vec3 extends vec2 {
         }
     }
 
-    add(p0: vec3): vec3 {
+    add(p0: number | vec3): vec3 {
+        if (typeof (p0) == 'number') {
+            return new vec3(this.x + p0, this.y + p0, this.z+ p0);
+        }
+
         return new vec3(this.x + p0.x, this.y + p0.y, this.z + p0.z);
     }
 
-    sub(p0: vec3): vec3 {
+    sub(p0: number | vec3): vec3 {
+        if (typeof (p0) == 'number') {
+            return new vec3(this.x - p0, this.y - p0, this.z - p0);
+        }
+
         return new vec3(this.x - p0.x, this.y - p0.y, this.z - p0.z);
     }
 
@@ -79,6 +114,10 @@ export class vec3 extends vec2 {
         }
 
         return new vec3(this.x / p0, this.y / p0, this.z / p0);
+    }
+
+    neg(): vec3 {
+        return new vec3(-this.x,-this.y,-this.z);
     }
 }
 
@@ -99,6 +138,10 @@ export class vec4 extends vec3 {
         if (w != null) {
             this.w = w;
         }
+    }
+
+    get rgb(): vec3 {
+        return new vec3(this.x, this.y, this.z);
     }
 
     add(p0: vec4): vec4 {
@@ -124,11 +167,14 @@ export class vec4 extends vec3 {
 
         return new vec4(this.x / p0, this.y / p0, this.z / p0, this.w / p0);
     }
+    neg(): vec4 {
+        return new vec3(-this.x, -this.y, -this.z, -this.w);
+    }
 }
 
 export function _vec4(x?: number | vec3, y?: number, z?: number, w?: number) {
     if (x instanceof vec3) {
-        return new vec4(x.x,x.y,x.z,0);
+        return new vec4(x.x,x.y,x.z,1);
     }
 
     return new vec4(x, y, z, w);
@@ -158,19 +204,19 @@ export function normalize(x: any):any {
         return 1;
     }
 
-    if (x instanceof vec3) {
-        let v: vec3 = new vec3();
-        v.x = x.x / length(x);
-        v.y = x.y / length(x);
-        v.z = x.z / length(x);
-
-        return v;
-    } else if (x instanceof vec4) {
+    if (x instanceof vec4) {
         let v: vec4 = new vec4();
         v.x = x.x / length(x);
         v.y = x.y / length(x);
         v.z = x.z / length(x);
         v.w = x.w / length(x);
+
+        return v;
+    } else if (x instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = x.x / length(x);
+        v.y = x.y / length(x);
+        v.z = x.z / length(x);
 
         return v;
     }
@@ -201,10 +247,10 @@ export function distance(p0: any, p1: any): number {
     return length(p0.sub(p1));
 }
 export function length(orig: any): number {
-    if (orig instanceof vec3) {
-        return Math.sqrt(orig.x * orig.x + orig.y * orig.y + orig.z * orig.z);
-    } else if (orig instanceof vec4) {
+    if (orig instanceof vec4) {
         return Math.sqrt(orig.x * orig.x + orig.y * orig.y + orig.z * orig.z + orig.w * orig.w);
+    } else if (orig instanceof vec3) {
+        return Math.sqrt(orig.x * orig.x + orig.y * orig.y + orig.z * orig.z);
     }
 
     return Math.sqrt(orig.x * orig.x + orig.y * orig.y);
@@ -252,6 +298,32 @@ export function clamp(p0: any, min: any, max: any): any {
     if (p0.y < max.y) clamped.y = max.y;
 
     return clamped;
+}
+export function pow(x:any,y:any):any {
+    if (x instanceof vec4 && y instanceof vec4) {
+        let v: vec4 = new vec4();;
+        v.x = Math.pow(x.x,y.x);
+        v.y = Math.pow(x.y,y.y);
+        v.z = Math.pow(x.z,y.z);
+        v.w = Math.pow(x.w,y.w);
+        return v;
+    } else if (x instanceof vec3 && y instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = Math.pow(x.x, y.x);
+        v.y = Math.pow(x.y, y.y);
+        v.z = Math.pow(x.z, y.z);
+        return v;
+    } else if (x instanceof vec2 && y instanceof vec2) {
+        let v: vec2 = new vec2();
+        v.x = Math.pow(x.x, y.x);
+        v.y = Math.pow(x.y, y.y);
+        return v;
+    }
+
+    if (typeof (x) == "number" && typeof (y) == "number") {
+        return (Math.pow(x as number, y as number));
+    }
+    return 1;
 }
 
 export function step(edge:any, x: any):any {

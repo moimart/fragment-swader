@@ -1,3 +1,5 @@
+import { pipeline } from "stream";
+
 export class vec2 {
     public x: number = 0;
     public y: number = 0;
@@ -86,6 +88,10 @@ export class vec2 {
     neg(): vec2 {
         return new vec3(-this.x, -this.y);
     }
+
+    public get array():number[] {
+        return [this.x,this.y];
+    }
 }
 
 export function _vec2(x?: number, y?: number) {
@@ -151,6 +157,11 @@ export class vec3 extends vec2 {
     neg(): vec3 {
         return new vec3(-this.x,-this.y,-this.z);
     }
+
+
+    public get array(): number[] {
+        return [this.x, this.y,this.z];
+    }
 }
 
 export function _vec3(x?: number | vec2, y?: number, z?: number) {
@@ -211,6 +222,11 @@ export class vec4 extends vec3 {
     neg(): vec4 {
         return new vec4(-this.x, -this.y, -this.z, -this.w);
     }
+
+
+    public get array(): number[] {
+        return [this.x, this.y, this.z, this.w];
+    }
 }
 
 export function _vec4(x?: number | vec3, y?: number, z?: number, w?: number) {
@@ -222,12 +238,28 @@ export function _vec4(x?: number | vec3, y?: number, z?: number, w?: number) {
 }
 
 export type RGBA = vec4;
-export function dot(x:any, y:any): any {
-    if (x instanceof vec3 && y instanceof vec3) {
-        
-    } else if (x instanceof vec4 && y instanceof vec4) {
 
+const _dot = (xs: number[], ys: number[]) => {
+
+    const zipWith = (f, xs, ys) => {
+        const ny = ys.length;
+        return (xs.length <= ny ? xs : xs.slice(0, ny))
+            .map((x, i) => f(x, ys[i]));
     }
+
+    const sum = xs => xs ? xs.reduce((a, b) => a + b, 0) : undefined;
+
+    return xs.length === ys.length ? (
+        sum(zipWith((a, b) => a * b, xs, ys))
+    ) : undefined;
+}
+
+export function dot(x:any, y:any): any | undefined {
+    if (x instanceof vec2 && y instanceof vec2) {
+        return _dot(x.array,y.array);
+    }
+
+    return undefined;
 }
 
 export function cross(x:vec3, y:vec3):vec3 {
@@ -482,47 +514,51 @@ export function mix(x: any, y: any, a: any):any {
 }
 
 export function radians(degrees: any): any {
-    if (degrees instanceof vec3) {
-        let v:vec3 = new vec3();
-        v.x = 0;
-        v.y = 0;
-        v.z = 0;
-        return v;
-    } else if (degrees instanceof vec4) {
+    if (radians instanceof vec4) {
         let v: vec4 = new vec4();
-        v.x = 0;
-        v.y = 0;
-        v.z = 0;
-        v.w = 0;
+        v.x = degrees.x * Math.PI / 180;
+        v.y = degrees.y * Math.PI / 180;
+        v.z = degrees.z * Math.PI / 180;
+        v.w = degrees.w * Math.PI / 180;
+        return v;
+    } else if (radians instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = degrees.x * Math.PI / 180;
+        v.y = degrees.y * Math.PI / 180;
+        v.z = degrees.z * Math.PI / 180;
+        return v;
+    } else if (radians instanceof vec2) {
+        let v: vec2 = new vec2();
+        v.x = degrees.x * Math.PI / 180;
+        v.y = degrees.y * Math.PI / 180;
         return v;
     }
 
-    let v: vec2 = new vec2();
-    v.x = 0;
-    v.y = 0;
-    return v;
+    return (degrees as number) * Math.PI / 180;
 }
 
 export function degrees(radians:any):any {
-    if (radians instanceof vec3) {
-        let v: vec3 = new vec3();
-        v.x = 0;
-        v.y = 0;
-        v.z = 0;
-        return v;
-    } else if (radians instanceof vec4) {
+    if(radians instanceof vec4) {
         let v: vec4 = new vec4();
-        v.x = 0;
-        v.y = 0;
-        v.z = 0;
-        v.w = 0;
+        v.x = radians.x * 180 / Math.PI;
+        v.y = radians.y * 180 / Math.PI;
+        v.z = radians.z * 180 / Math.PI;
+        v.w = radians.w * 180 / Math.PI;
+        return v;
+    } else if (radians instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = radians.x*180 / Math.PI;
+        v.y = radians.y*180 / Math.PI;
+        v.z = radians.z*180 / Math.PI;
+        return v;
+    } else if (radians instanceof vec2) {
+        let v: vec2 = new vec2();
+        v.x = radians.x * 180 / Math.PI;
+        v.y = radians.y * 180 / Math.PI;
         return v;
     }
 
-    let v: vec2 = new vec2();
-    v.x = 0;
-    v.y = 0;
-    return v;
+    return (radians as number) * 180 / Math.PI;
 }
 
 export function sin(x:any): any {
@@ -658,83 +694,134 @@ export function atan(x: any, y:any): any {
 }
 
 export function exp(x: any): any {
-    if (x instanceof vec3) {
-        let v: vec3 = new vec3();
-        v.x = Math.exp(x.x);
-        v.y = Math.exp(x.y);
-        v.z = Math.exp(x.z);
-        return v;
-    } else if (x instanceof vec4) {
+    if (x instanceof vec4) {
         let v: vec4 = new vec4();
         v.x = Math.exp(x.x);
         v.y = Math.exp(x.y);
         v.z = Math.exp(x.z);
         v.w = Math.exp(x.w);
         return v;
+    } else if (x instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = Math.exp(x.x);
+        v.y = Math.exp(x.y);
+        v.z = Math.exp(x.z);
+        return v;
+    } else if (x instanceof vec2) {
+        let v: vec2 = new vec2();
+        v.x = Math.exp(x.x);
+        v.y = Math.exp(x.y);
+        return v;
     }
 
-    let v: vec2 = new vec2();
-    v.x = Math.log(x.x);
-    v.y = Math.log(x.y);
-    return v;
+    return Math.exp(x as number);
 }
 
 export function log(x: any): any {
-    if (x instanceof vec3) {
-        let v: vec3 = new vec3();
-        v.x = Math.log(x.x);
-        v.y = Math.log(x.y);
-        v.z = Math.log(x.z);
-        return v;
-    } else if (x instanceof vec4) {
+    if(x instanceof vec4) {
         let v: vec4 = new vec4();
         v.x = Math.log(x.x);
         v.y = Math.log(x.y);
         v.z = Math.log(x.z);
         v.w = Math.log(x.w);
         return v;
+    } else if (x instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = Math.log(x.x);
+        v.y = Math.log(x.y);
+        v.z = Math.log(x.z);
+        return v;
+    } else if (x instanceof vec2) {
+        let v: vec4 = new vec4();
+        v.x = Math.log(x.x);
+        v.y = Math.log(x.y);
+        return v;
     }
 
-    let v: vec2 = new vec2();
-    v.x = Math.log(x.x);
-    v.y = Math.log(x.y);
-    return v;
+    return Math.log(x as number);
 }
 
 export function exp2(x: any): any {
-    if (x instanceof vec3) {
-
-    } else if (x instanceof vec4) {
-
+    if (x instanceof vec4) {
+        let v: vec4 = new vec4();
+        v.x = Math.exp(x.x);
+        v.y = Math.exp(x.y);
+        v.z = Math.exp(x.z);
+        v.w = Math.exp(x.w);
+        return v;
+    } else if (x instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = Math.exp(x.x);
+        v.y = Math.exp(x.y);
+        v.z = Math.exp(x.z);
+        return v;
+    } else if (x instanceof vec2) {
+        let v: vec2 = new vec2();
+        v.x = Math.exp(x.x);
+        v.y = Math.exp(x.y);
+        return v;
     }
+
+    return Math.exp(x as number);
 }
 
 export function log2(x: any): any {
-    if (x instanceof vec3) {
-        let v: vec3 = new vec3();
-        v.x = Math.log2(x.x);
-        v.y = Math.log2(x.y);
-        v.z = Math.log2(x.z);
-        return v;
-    } else if (x instanceof vec4) {
+    if (x instanceof vec4) {
         let v: vec4 = new vec4();
         v.x = Math.log2(x.x);
         v.y = Math.log2(x.y);
         v.z = Math.log2(x.z);
         v.w = Math.log2(x.w);
         return v;
+    } else if (x instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = Math.log2(x.x);
+        v.y = Math.log2(x.y);
+        v.z = Math.log2(x.z);
+        return v;
+    } else if (x instanceof vec2) {
+        let v: vec2 = new vec2();
+        v.x = Math.log2(x.x);
+        v.y = Math.log2(x.y);
+        return v;
     }
 
-    let v: vec2 = new vec2();
-    v.x = Math.log2(x.x);
-    v.y = Math.log2(x.y);
-    return v;
+    return Math.log2(x as number);
 }
 
 export function inversesqrt(x: any): any {
-    if (x instanceof vec3) {
 
-    } else if (x instanceof vec4) {
+    const buf = new ArrayBuffer(4),
+        f32 = new Float32Array(buf),
+        u32 = new Uint32Array(buf);
 
+    function _rsqrt(x) {
+        const x2 = 0.5 * (f32[0] = x);
+        u32[0] = (0x5f3759df - (u32[0] >> 1)); // what the fuck? 
+        let y = f32[0];
+        y = y * (1.5 - (x2 * y * y));   // 1st iteration
+        return y;
     }
+
+    if (x instanceof vec4) {
+        let v: vec4 = new vec4();
+        v.x = _rsqrt(x.x);
+        v.y = _rsqrt(x.y);
+        v.z = _rsqrt(x.z);
+        v.w = _rsqrt(x.w);
+        return v;
+    } else if (x instanceof vec3) {
+        let v: vec3 = new vec3();
+        v.x = _rsqrt(x.x);
+        v.y = _rsqrt(x.y);
+        v.z = _rsqrt(x.z);
+        return v;
+    } else if (x instanceof vec2) {
+        let v: vec2 = new vec2();
+        v.x = _rsqrt(x.x);
+        v.y = _rsqrt(x.y);
+        return v;
+    }
+
+    return Math.sqrt(x as number);
 }

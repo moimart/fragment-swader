@@ -19,7 +19,7 @@ import {
 let myShader: Shader = (coords: vec2, samplers: Array<textureInfo>) => {
     let d = (0.8 - distance(coords, _vec2(.5)));
     d = smoothstep(.2,.6,d);
-    let c = textureFetch(samplers[0], coords.mul(3.25),"repeat");
+    let c = textureFetch(samplers[0], coords,"repeat");
     
     let color = c.mul(d);
     color.a = 1;
@@ -38,6 +38,7 @@ let fancyShader: Shader = (coords: vec2, samplers: Array<textureInfo>) => {
 async function _() {
     let s = new ShaderProcess(myShader);
     //s.size = _vec2(828,1190);
+    s.size = s.size.mul(2);
     await s.addTexture('texture.png').catch(err => console.error(err));
     s.run();
     s.extract().png().toFile('test.png', (err, info) => {

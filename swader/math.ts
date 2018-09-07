@@ -335,11 +335,11 @@ export function clamp(p0: any, min: any, max: any): any {
         if (p0.x < min.x) clamped.x = min.x;
         if (p0.x > max.x) clamped.x = max.x;
         if (p0.y < min.y) clamped.y = min.y;
-        if (p0.y < max.y) clamped.y = max.y;
+        if (p0.y > max.y) clamped.y = max.y;
         if (p0.z < min.z) clamped.z = min.z;
-        if (p0.z < max.z) clamped.z = max.z;
+        if (p0.z > max.z) clamped.z = max.z;
         if (p0.z < min.w) clamped.w = min.w;
-        if (p0.z < max.w) clamped.w = max.w;
+        if (p0.z > max.w) clamped.w = max.w;
 
         return clamped;
     } else if (p0 instanceof vec3) {
@@ -347,17 +347,17 @@ export function clamp(p0: any, min: any, max: any): any {
         if (p0.x < min.x) clamped.x = min.x;
         if (p0.x > max.x) clamped.x = max.x;
         if (p0.y < min.y) clamped.y = min.y;
-        if (p0.y < max.y) clamped.y = max.y;
+        if (p0.y > max.y) clamped.y = max.y;
         if (p0.z < min.z) clamped.z = min.z;
-        if (p0.z < max.z) clamped.z = max.z;
+        if (p0.z > max.z) clamped.z = max.z;
 
         return clamped;
     } else if (p0 instanceof vec2) {
         let clamped = new vec2(p0.x, p0.y);
 
         if (p0.x < min.x) clamped.x = min.x;
-        if (p0.y < min.y) clamped.y = min.y;
         if (p0.x > max.x) clamped.x = max.x;
+        if (p0.y < min.y) clamped.y = min.y;
         if (p0.y > max.y) clamped.y = max.y;
 
         return clamped;

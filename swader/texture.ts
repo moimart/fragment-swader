@@ -22,32 +22,23 @@ function nearestNeighbor(coords:vec2, size:vec2, data:Uint32Array, mode:string):
         (rawColor >> 24) & 0xff);
 }
 
-function bilinear(coords: vec2, size: vec2, data: Uint32Array, mode: string): RGBA {   
-    let _coords00: vec2 = new vec2(Math.floor(coords.x * size.x), Math.floor(coords.y * size.y));
-    let _coords10: vec2 = new vec2(Math.ceil(coords.x * size.x), Math.floor(coords.y * size.y));
-    let _coords01: vec2 = new vec2(Math.floor(coords.x * size.x), Math.ceil(coords.y * size.y));
-    let _coords11: vec2 = new vec2(Math.ceil(coords.x * size.x), Math.ceil(coords.y * size.y));
+function bilinear(coords: vec2, size: vec2, data: Uint32Array, mode: string): RGBA {
+    let ncoords: vec2 = _vec2(coords.x,coords.y);
 
     if (mode == "clamp") {
-        _coords00.x = (_coords00.x > size.x) ? size.x : _coords00.x;
-        _coords00.y = (_coords00.y > size.y) ? size.y : _coords00.y;
-        _coords10.x = (_coords10.x > size.x) ? size.x : _coords10.x;
-        _coords10.y = (_coords10.y > size.y) ? size.y : _coords10.y;
-        _coords01.x = (_coords01.x > size.x) ? size.x : _coords01.x;
-        _coords01.y = (_coords01.y > size.y) ? size.y : _coords01.y;
-        _coords11.x = (_coords11.x > size.x) ? size.x : _coords11.x;
-        _coords11.y = (_coords11.y > size.y) ? size.y : _coords11.y;
+        ncoords = clamp(ncoords, _vec2(0), _vec2(1));
     } else if (mode == "repeat") {
-        //FIXME:
-        _coords00.x = (_coords00.x > size.x) ? (_coords00.x % size.x) : _coords00.x;
-        _coords00.y = (_coords00.y > size.y) ? (_coords00.y % size.y) : _coords00.y;
-        _coords10.x = (_coords10.x > size.x) ? (_coords10.x % size.x) : _coords10.x;
-        _coords10.y = (_coords10.y > size.y) ? (_coords10.y % size.y) : _coords10.y;
-        _coords01.x = (_coords01.x > size.x) ? (_coords01.x % size.x) : _coords01.x;
-        _coords01.y = (_coords01.y > size.y) ? (_coords01.y % size.y) : _coords01.y;
-        _coords11.x = (_coords11.x > size.x) ? (_coords11.x % size.x) : _coords11.x;
-        _coords11.y = (_coords11.y > size.y) ? (_coords11.y % size.y) : _coords11.y;
+        ncoords.x = (ncoords.x > 1) ? (ncoords.x % 1) : ncoords.x;
+        ncoords.y = (ncoords.y > 1) ? (ncoords.y % 1) : ncoords.y;
     }
+
+    let _coords00: vec2 = new vec2(Math.floor(ncoords.x * size.x), Math.floor(ncoords.y * size.y));
+    let _coords10: vec2 = new vec2(Math.ceil(ncoords.x * size.x), Math.floor(ncoords.y * size.y));
+    let _coords01: vec2 = new vec2(Math.floor(ncoords.x * size.x), Math.ceil(ncoords.y * size.y));
+    let _coords11: vec2 = new vec2(Math.ceil(ncoords.x * size.x), Math.ceil(ncoords.y * size.y));
+
+    let dx = ncoords.x - Math.floor(ncoords.x);
+    let dy = ncoords.y - Math.floor(ncoords.y);
 
     let _c00 = data[_coords00.y * size.x + _coords00.x];
     let _c10 = data[_coords10.y * size.x + _coords10.x];
@@ -79,18 +70,15 @@ function bilinear(coords: vec2, size: vec2, data: Uint32Array, mode: string): RG
         (_c11 >> 24) & 0xff);
 
     let _bilinear =
-        (tx: number, ty: number, c00: vec4, c10: vec4, c01: vec4,
+        (t: vec2, c00: vec4, c10: vec4, c01: vec4,
          c11: vec4) => {
-            let a: vec4 = c00.mul(1 - tx).add(c10.mul(tx));
-            let b: vec4 = c01.mul(1 - tx).add(c11.mul(tx));
-            let r: vec4 = a.mul(1 - ty).add(b.mul(ty));
+            let a: vec4 = c00.mul(1 - t.x).add(c10.mul(t.x));
+            let b: vec4 = c01.mul(1 - t.x).add(c11.mul(t.x));
+            let r: vec4 = a.mul(1 - t.y).add(b.mul(t.y));
             return r;
         }
-
-    let dx = coords.x - Math.floor(coords.x);
-    let dy = coords.y - Math.floor(coords.y);
     
-    return _bilinear(coords.x, coords.y, c00, c10, c01, c11);
+    return _bilinear(ncoords, c00, c10, c01, c11);
 }
 
 export function textureFetch(

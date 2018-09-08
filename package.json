@@ -1,6 +1,6 @@
 {
   "name": "fragment-swader",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Write fragment shaders in typescript for static image manipulation",
   "main": "swader.js",
   "types": "swader/index.d.ts",

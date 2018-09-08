@@ -112,8 +112,8 @@ export class PostProcess {
                 s.run();
             }
         } catch (exception) { 
-            console.log('Error at processing: ' + exception);
-        };
+            throw 'Error at processing: ' + exception;
+        }; 
     }
 
     public get framebuffer():Buffer {

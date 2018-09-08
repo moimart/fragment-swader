@@ -52,11 +52,11 @@ _();
 ```
 
 # Source image 
-![alt text](https://imgur.com/a/jEb45zw "Original")
+![alt text](https://i.imgur.com/QauclJr.png "Original")
 
 # Result 
 
-![alt text](https://imgur.com/a/OM6agu7 "Result")
+![alt text](https://i.imgur.com/icIlBwZ.png "Result")
 
 # Example for postprocessing (Blur)
 
@@ -135,8 +135,8 @@ _();
 ```
 
 # Source image 
-![alt text](https://imgur.com/a/jEb45zw "Original")
+![alt text](https://i.imgur.com/QauclJr.png "Original")
 
 # Result 
 
-![alt text](https://imgur.com/a/qppOWoh "Postprocess result")
+![alt text](https://i.imgur.com/veG2CMR.png "Postprocess result")

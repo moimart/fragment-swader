@@ -1,6 +1,9 @@
 import { vec2, vec4, _vec4, RGBA, clamp, _vec2 } from './math';
 
-export type textureInfo = [Uint32Array, vec2];
+export interface TextureInfo {
+    buffer?: Uint32Array;
+    size?: vec2;
+}
 
 function nearestNeighbor(coords:vec2, size:vec2, data:Uint32Array, mode:string):RGBA {
     let rCoords: vec2 = new vec2(Math.floor(coords.x * size.x), Math.floor(coords.y * size.y));
@@ -82,19 +85,19 @@ function bilinear(coords: vec2, size: vec2, data: Uint32Array, mode: string): RG
 }
 
 export function textureFetch(
-    texture: textureInfo, 
+    texture: TextureInfo, 
     coords: vec2, 
-    mode: string = "clamp", 
+    mode: string = "repeat", 
     filtering: string = "bilinear"): RGBA {
 
     let rgba: RGBA = new vec4();
     switch (filtering) {
         case "bilinear":
-            rgba = bilinear(coords, texture[1], texture[0], mode);
+            rgba = bilinear(coords, texture.size, texture.buffer, mode);
             break;
         case "nearest":
         default:
-            rgba = nearestNeighbor(coords, texture[1], texture[0], mode);
+            rgba = nearestNeighbor(coords, texture.size, texture.buffer, mode);
             break;
     }
     

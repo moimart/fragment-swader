@@ -1,13 +1,13 @@
 import * as fs from 'fs';
 import * as sharp from 'sharp';
-import { clamp, distance, length, RGBA, vec2, vec3, vec4 } from './math';
-import { textureInfo } from './texture';
+import { clamp, distance, length, RGBA, vec2, vec3, vec4, _vec2 } from './math';
+import { TextureInfo } from './texture';
 
-export type Shader = (coords: vec2, samplers: Array<textureInfo>) => RGBA;
+export type Shader = (coords: vec2, samplers: Array<TextureInfo>) => RGBA;
 export class ShaderProcess {
     public size: vec2 = new vec2(1024, 576);
     private _framebuffer?: Buffer;
-    private samplers: Array<textureInfo> = new Array<textureInfo>();
+    public samplers: Array<TextureInfo> = new Array<TextureInfo>();
 
     public get framebuffer(): Buffer {
         return this._framebuffer;
@@ -32,7 +32,7 @@ export class ShaderProcess {
             }
 
             let metadata = await image.metadata();
-            this.samplers.push([arr, new vec2(metadata.width, metadata.height)]);
+            this.samplers.push({buffer: arr, size: new vec2(metadata.width, metadata.height)});
         } catch(e) {
             throw 'Could not load texture ' + e;
         }
@@ -48,7 +48,7 @@ export class ShaderProcess {
             read += 4;
         }
 
-        this.samplers.push([arr, size]);
+        this.samplers.push({buffer: arr, size: size});
     }
 
     run(): void {
@@ -73,7 +73,62 @@ export class ShaderProcess {
         });
     }
 
-    execute(coords: vec2): RGBA {
+    private execute(coords: vec2): RGBA {
         return this.shader(coords, this.samplers).mul(255);
+    }
+}
+
+export interface ShaderPass {
+    shader:Shader;
+    textures:Array<string>;
+    process?:ShaderProcess;
+}
+
+export class PostProcess {
+    private passes:Array<ShaderPass> = new Array<ShaderPass>();
+    public size:vec2 = _vec2(1024,576);
+
+    constructor(passes:Array<ShaderPass>) {
+        this.passes = passes;
+    }
+    async run() {
+        try {
+            for (let j = 0; j < this.passes.length; j++) {
+                let pass = this.passes[j];
+                this.passes[j].process = new ShaderProcess(pass.shader);
+                let s = this.passes[j].process;
+                s.size = this.size;
+
+                if (j > 0) {
+                    await s.addTextureFromFramebuffer(
+                        this.passes[j - 1].process.framebuffer,
+                        this.passes[j - 1].process.size);
+                }
+
+                for (const texture of pass.textures) {
+                    await s.addTexture(texture);
+                }
+            
+                s.run();
+            }
+        } catch (exception) { 
+            console.log('Error at processing: ' + exception);
+        };
+
+        console.log('this is done');
+    }
+
+    public get framebuffer():Buffer {
+        return this.passes[this.passes.length - 1].process.framebuffer;
+    }
+
+    extract(): sharp.SharpInstance {
+        return sharp(this.framebuffer, {
+            raw: {
+                width: this.size.x,
+                height: this.size.y,
+                channels: 4
+            }
+        });
     }
 }

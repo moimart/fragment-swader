@@ -1,13 +1,15 @@
 export * from './math';
 
 export {
-    textureInfo,
+    TextureInfo,
     textureFetch
 } from './texture';
 
 export { 
     Shader,
-    ShaderProcess
+    ShaderProcess,
+    ShaderPass,
+    PostProcess
 } from './shader';
 
 

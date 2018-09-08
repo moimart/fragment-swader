@@ -92,6 +92,16 @@ export class vec2 {
     public get array():number[] {
         return [this.x,this.y];
     }
+
+    swizzle(vars:string):vec2 {
+        let v:vec2 = new vec2();
+
+        if (vars.length > 2) {
+            
+        }
+
+        return v;
+    }
 }
 
 export function _vec2(x?: number, y?: number) {

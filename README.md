@@ -40,7 +40,17 @@ async function _() {
     // Create shader
     let s = new ShaderProcess(myShader);
     s.size = $._vec2(1024, 576).mul(2); //Double the resolution!
+    
+    s.onProgress = (progress: number) => {
+        process.stdout.write(' Progress: ' + Math.floor(progress*100) + '%\r');
+
+        if (progress == 1) {
+            console.log(' Progress: 100% Done!');
+        }
+    };
+
     await s.addTexture('texture.png').catch(err => console.error(err));
+    
     s.run();
     s.extract().png().toFile('test.png', (err, info) => {
         err && console.log(err);
@@ -123,9 +133,16 @@ async function _() {
         textures:new Array<string>()
     });
 
-    let process = new $.PostProcess(passes);
-    await process.run();
-    process.extract().png().toFile('test-process.png', (err,info) => {
+    let postProcess = new $.PostProcess(passes);
+    postProcess.onProgress = (progress: number) => {
+        process.stdout.write(' Postprocessing Progress: ' + Math.floor(progress * 100) + '%\r');
+
+        if (progress == 1) {
+            console.log(' Postprocessing Progress: 100% Done!');
+        }
+    };
+    await postProcess.run();
+    postProcess.extract().png().toFile('test-process.png', (err, info) => {
         err && console.log(err);
     });
 }

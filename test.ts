@@ -63,6 +63,13 @@ let blurrPass2: $.Shader = (coords: $.vec2, samplers: Array<$.TextureInfo>) => {
 async function _() {
     let s = new $.ShaderProcess(myShader);
     s.size = $._vec2(1024, 576).mul(2);
+    s.onProgress = (progress: number) => {
+        process.stdout.write(' Progress: ' + Math.floor(progress*100) + '%\r');
+
+        if (progress == 1) {
+            console.log(' Progress: 100% Done!');
+        }
+    };
     await s.addTexture('texture.png').catch(err => console.error(err));
     s.run();
     s.extract().png().toFile('test.png', (err, info) => {
@@ -83,9 +90,23 @@ async function __() {
         textures:new Array<string>()
     });
 
-    let process = new $.PostProcess(passes);
-    await process.run();
-    process.extract().png().toFile('test-process.png', (err,info) => {
+    passes.push({
+        shader: myShader,
+        textures: new Array<string>()
+    });
+
+    passes.push({shader: myShader, textures: new Array<string>()});
+
+    let postProcess = new $.PostProcess(passes);
+    postProcess.onProgress = (progress: number) => {
+        process.stdout.write(' Postprocessing Progress: ' + Math.floor(progress * 100) + '%\r');
+
+        if (progress == 1) {
+            console.log(' Postprocessing Progress: 100% Done!');
+        }
+    };
+    await postProcess.run();
+    postProcess.extract().png().toFile('test-process.png', (err, info) => {
         err && console.log(err);
     });
 }

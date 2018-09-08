@@ -4,9 +4,11 @@ import { clamp, distance, length, RGBA, vec2, vec3, vec4, _vec2 } from './math';
 import { TextureInfo } from './texture';
 
 export type Shader = (coords: vec2, samplers: Array<TextureInfo>) => RGBA;
+export type ShaderProgress = (progress:number) => void;
 export class ShaderProcess {
     public size: vec2 = new vec2(1024, 576);
     private _framebuffer?: Buffer;
+    private progress:ShaderProgress = null;
     public samplers: Array<TextureInfo> = new Array<TextureInfo>();
 
     public get framebuffer(): Buffer {
@@ -16,6 +18,10 @@ export class ShaderProcess {
     constructor(shader: Shader) {
         this._framebuffer = Buffer.alloc(4 * this.size.x * this.size.y);
         this.shader = shader;
+    }
+
+    public set onProgress(callback:ShaderProgress) {
+        this.progress = callback;
     }
 
     async addTexture(texture: string) {
@@ -58,9 +64,17 @@ export class ShaderProcess {
                 let fragment: RGBA = this.execute(new vec2(j / this.size.x, i / this.size.y));
                 const order = i * this.size.x + j;
                 buffer[order] = fragment.w << 24 | fragment.z << 16 | fragment.y << 8 | fragment.x;
+
+                if (this.progress != null) {
+                    this.progress(order / (this.size.x * this.size.y));
+                }
             }
         }
         this._framebuffer = Buffer.from(buffer.buffer);
+
+        if (this.progress != null) {
+            this.progress(1);
+        }
     }
 
     extract(): sharp.SharpInstance {
@@ -87,6 +101,8 @@ export interface ShaderPass {
 export class PostProcess {
     private passes:Array<ShaderPass> = new Array<ShaderPass>();
     public size:vec2 = _vec2(1024,576);
+    private progress: ShaderProgress = null;
+    private shaderProgress: number = 0;
 
     constructor(passes:Array<ShaderPass>) {
         this.passes = passes;
@@ -108,6 +124,16 @@ export class PostProcess {
                 for (const texture of pass.textures) {
                     await s.addTexture(texture);
                 }
+
+                s.onProgress = (value: number) => {
+                    if (this.progress != null) {
+                        this.progress((value + this.shaderProgress)*.25);
+
+                        if (value == 1) {
+                            this.shaderProgress++;
+                        }
+                    }
+                }
             
                 s.run();
             }
@@ -118,6 +144,10 @@ export class PostProcess {
 
     public get framebuffer():Buffer {
         return this.passes[this.passes.length - 1].process.framebuffer;
+    }
+
+    public set onProgress(callback: ShaderProgress) {
+        this.progress = callback;
     }
 
     extract(): sharp.SharpInstance {

@@ -90,11 +90,6 @@ async function __() {
         textures:new Array<string>()
     });
 
-    passes.push({
-        shader: myShader,
-        textures: new Array<string>()
-    });
-
     passes.push({shader: myShader, textures: new Array<string>()});
 
     let postProcess = new $.PostProcess(passes);
@@ -111,4 +106,4 @@ async function __() {
     });
 }
 
-__();
+_();

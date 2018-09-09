@@ -27,6 +27,12 @@ export class ShaderProcess {
     async addTexture(texture: string) {
         try {
             let image = sharp(texture);
+            let metadata = await image.metadata();
+
+            if (metadata.channels < 4) {
+                throw 'Image does not have alpha channel';
+            }
+
             let data = await image.raw().toBuffer();
             let arr = new Uint32Array(data.length / 4);
 
@@ -37,10 +43,9 @@ export class ShaderProcess {
                 read += 4;
             }
 
-            let metadata = await image.metadata();
             this.samplers.push({buffer: arr, size: new vec2(metadata.width, metadata.height)});
         } catch(e) {
-            throw 'Could not load texture ' + e;
+            throw 'Could not load texture: ' + e;
         }
     }
 

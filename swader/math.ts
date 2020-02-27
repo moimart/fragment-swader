@@ -511,12 +511,24 @@ export function smoothstep(edge0: any, edge1: any, x: any):any {
 
 export function mix(x: any, y: any, a: any):any {
     if (x instanceof vec3 && y instanceof vec3) {
+        let b = clamp(a,0.0,1.0);
         let v:vec3 = new vec3();
+        v.x = x.x + b * (y.x - x.x);
+        v.y = x.y + b * (y.y - x.y);
+        v.z = x.z + b * (y.z - x.z);
+        return v;
     } else if (x instanceof vec4 && y instanceof vec4) {
+        let b = clamp(a,0.0,1.0);
         let v:vec4 = new vec4();
+        v.x = x.x + b * (y.x - x.x);
+        v.y = x.y + b * (y.y - x.y);
+        v.z = x.z + b * (y.z - x.z);
+        v.w = x.w + b * (y.w - x.w);
+        return v;
     }
 
     let v:vec2 = new vec2();
+    return v;
 }
 
 export function radians(degrees: any): any {

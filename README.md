@@ -63,6 +63,7 @@ _();
 
 # Source image 
 ![alt text](https://i.imgur.com/QauclJr.png "Original")
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmoimart%2Ffragment-swader.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmoimart%2Ffragment-swader?ref=badge_shield)
 
 # Result 
 
@@ -157,3 +158,7 @@ _();
 # Result 
 
 ![alt text](https://i.imgur.com/veG2CMR.png "Postprocess result")
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmoimart%2Ffragment-swader.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmoimart%2Ffragment-swader?ref=badge_large)
